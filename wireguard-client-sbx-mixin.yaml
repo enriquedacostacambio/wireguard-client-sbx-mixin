@@ -1,0 +1,20 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: WireGuard client mixin
+dockerfile: Dockerfile
+
+args:
+  wireguard_client_mode:
+    default: none
+    enum: [none, auto]
+  wireguard_client_config:
+    default: ""
+
+provides: ["wireguard-client@0.0.1"]
+
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: /opt/wireguard-client-sbx-mixin/install.sh "${{ kit.args.wireguard_client_mode}}" "${{ kit.args.wireguard_client_config}}"

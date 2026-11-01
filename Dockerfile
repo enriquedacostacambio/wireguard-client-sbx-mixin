@@ -1,21 +1,15 @@
-ARG WIREGUARD_GO_VERSION
+FROM golang:1.27.3-alpine3.24 AS wireguard-go-build
 ARG TARGETARCH
-ARG WIREGUARD_TOOLS_VERSION
-ARG OPENRESOLV_VERSION
-ARG ALPINE_VERSION
-ARG GOLANG_VERSION
-
-FROM golang:${GOLANG_VERSION} AS wireguard-go-build
 WORKDIR /build
 RUN apk add --no-cache git \
     && git clone https://github.com/WireGuard/wireguard-go.git . \
-    && git checkout ${WIREGUARD_GO_VERSION} \
+    && git checkout 0.0.20250522 \
     && mkdir -p /build/output/ \
     && CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build \
        -ldflags="-s -w" \
        -o /build/output .
 
-FROM alpine:${ALPINE_VERSION} AS wireguard-tools-build
+FROM alpine:3.24.3 AS wireguard-tools-build
 WORKDIR /build
 RUN apk add --no-cache \
         git \
@@ -25,22 +19,12 @@ RUN apk add --no-cache \
         libmnl-dev \
         libmnl-static \
     && git clone https://github.com/wireguard/wireguard-tools.git . \
-    && git checkout ${WIREGUARD_TOOLS_VERSION} \
+    && git checkout v1.0.20260223 \
     && make -C src LDFLAGS="-static" \
     && chmod +x /build/src/wg-quick/linux.bash
-
-FROM alpine:${ALPINE_VERSION} AS openresolv-build
-WORKDIR /build
-RUN apk add --no-cache git make \
-    && git clone https://github.com/NetworkConfiguration/openresolv.git . \
-    && git checkout ${OPENRESOLV_VERSION} \
-    && ./configure \
-    && make DESTDIR=/output install \
-    && chmod +x /build/resolvconf
 
 FROM scratch
 COPY --from=wireguard-go-build /build/output/wireguard /usr/bin/wireguard
 COPY --from=wireguard-tools-build /build/src/wg /usr/bin/wg
 COPY --from=wireguard-tools-build /build/src/wg-quick/linux.bash /usr/bin/wg-quick
-COPY --from=openresolv-build /output /
-COPY wireguard-go-setup.sh /usr/bin/wireguard-client-setup.sh
+COPY install.sh /opt/wireguard-client-sbx-mixin/install.sh

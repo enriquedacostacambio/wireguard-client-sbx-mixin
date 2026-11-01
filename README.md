@@ -5,5 +5,28 @@ Docker Sandbox WireGuard client mixin (wireguard-go; userspace)
 ## Example
 
 ```sh
-sbx run shell --kit "git+https://github.com/enriquedacostacambio/wireguard-client-sbx-mixin.git#ref=v0.0.1" --kit-arg "wireguard_client_config=$(cat w0.conf)"
+sbx run shell \
+	--kit docker.io/enriquedacostacambio/wireguard-client-sbx-mixin:0.0.1
 ```
+
+Or if you want to autoconnect to on startup:
+```sh
+sbx run shell \
+	--kit docker.io/enriquedacostacambio/wireguard-client-sbx-mixin:0.0.1 \
+	--kit-arg "wireguard_client_mode=auto"
+	--kit-arg "wireguard_client_config=$(cat w0.conf)"
+```
+Where
+- `wireguard_client_config` is the wg-quick client configuration.
+
+## Publish
+
+```sh
+./publish.sh
+```
+To use the branch name as the tag
+
+```sh
+./publish.sh x.y.z
+```
+To specify a tag.
