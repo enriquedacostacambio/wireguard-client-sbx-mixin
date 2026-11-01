@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-TAG="${1:-$(git branch --show-current)}"
+TAG="${1:-$(git describe --exact-match --tags)}"
 
 docker buildx build . \
     -f wireguard-client-sbx-mixin.yaml \
