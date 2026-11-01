@@ -24,9 +24,9 @@ Where
 ```sh
 ./publish.sh
 ```
-To use the branch name as the tag
+To use the git tag name as the docker tag
 
 ```sh
 ./publish.sh x.y.z
 ```
-To specify a tag.
+To specify a docker tag.
