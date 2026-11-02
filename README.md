@@ -19,14 +19,13 @@ sbx run shell \
 Where
 - `wireguard_client_config` is the wg-quick client configuration.
 
-## Publish
+## Build
 
 ```sh
-./publish.sh
+./build.sh x.y.z
 ```
-To use the git tag name as the docker tag
 
+To publsh:
 ```sh
-./publish.sh x.y.z
+./build.sh x.y.z --push
 ```
-To specify a docker tag.
