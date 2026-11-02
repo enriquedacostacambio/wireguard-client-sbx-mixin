@@ -2,7 +2,11 @@ name: PR
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, edited]
     branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -19,4 +23,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     - name: Build and publish the Docker image
-      run: ./build.sh pr.${{ github.event.number }} --push
+      run: |
+          BUILD_ARGS=""
+          if [[ "${{ startsWith(github.event.pull_request.body, '!/push') || contains(github.event.pull_request.body, '\n!/push') }}" == "true" ]]; then
+            BUILD_ARGS="${BUILD_ARGS} --push"
+          fi
+          echo "Building with ${BUILD_ARGS}"
+          ./build.sh pr.${{ github.event.number }} ${BUILD_ARGS}
